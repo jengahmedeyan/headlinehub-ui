@@ -139,7 +139,7 @@ export function NewsHeader({
                   {hasActiveFilters && <div className="absolute -top-1 -right-1 h-3 w-3 bg-blue-600 rounded-full" />}
                 </Button>
               </SheetTrigger>
-              <SheetContent side="bottom" className="h-[80vh]">
+              <SheetContent side="bottom" className="h-[80vh] p-4">
                 <SheetHeader>
                   <SheetTitle>Filter Articles</SheetTitle>
                 </SheetHeader>
