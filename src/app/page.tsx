@@ -54,7 +54,6 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-gray-50">
       <NewsHeader
-        articleCount={articles.length}
         sources={sources}
         categories={categories}
         filters={filters}

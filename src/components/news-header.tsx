@@ -24,7 +24,6 @@ import { format } from "date-fns";
 import type { FilterState } from "../types/article";
 
 interface NewsHeaderProps {
-  articleCount: number;
   sources: string[];
   categories: string[];
   filters: FilterState;
@@ -34,7 +33,6 @@ interface NewsHeaderProps {
 }
 
 export function NewsHeader({
-  articleCount,
   sources,
   categories,
   filters,
@@ -72,14 +70,6 @@ export function NewsHeader({
             <p className="text-sm sm:text-base text-gray-600 mt-1 hidden sm:block">
               Stay updated with the latest news from multiple sources
             </p>
-          </div>
-          <div className="flex items-center gap-2 ml-4">
-            <Badge
-              variant="secondary"
-              className="text-xs sm:text-sm whitespace-nowrap"
-            >
-              {articleCount} articles
-            </Badge>
           </div>
         </div>
 
@@ -124,7 +114,7 @@ export function NewsHeader({
               </SelectContent>
             </Select>
 
-            <Select
+            {/* <Select
               value={filters.selectedCategory}
               onValueChange={(value) =>
                 onUpdateFilter("selectedCategory", value)
@@ -141,7 +131,7 @@ export function NewsHeader({
                   </SelectItem>
                 ))}
               </SelectContent>
-            </Select>
+            </Select> */}
 
             <DatePicker
               date={selectedDate}
