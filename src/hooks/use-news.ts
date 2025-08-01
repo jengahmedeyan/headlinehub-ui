@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import type { Article, FilterState } from "../types/article"
 import { ITEMS_PER_PAGE } from "../constants"
 import { getAllNews, getAvailableCategories, searchNews } from "@/app/actions/news"
@@ -16,6 +16,8 @@ export function useNews() {
   const [hasNextPage, setHasNextPage] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const bottomRef = useRef<HTMLDivElement | null>(null)
+  const observerRef = useRef<IntersectionObserver | null>(null)
+  const isInitialLoad = useRef(true)
 
   const [filters, setFilters] = useState<FilterState>({
     searchQuery: "",
@@ -28,12 +30,12 @@ export function useNews() {
     try {
       setLoading(true)
       const [newsResponse, categoriesData] = await Promise.all([
-        getAllNews(currentPage, ITEMS_PER_PAGE),
+        getAllNews(1, ITEMS_PER_PAGE),
         getAvailableCategories(),
       ])
 
       if (newsResponse.success) {
-        // Deduplicate articles by ID
+
         const uniqueArticles = newsResponse.data.filter(
           (article, index, self) => index === self.findIndex((a) => a.id === article.id),
         )
@@ -41,6 +43,7 @@ export function useNews() {
         setSources(newsResponse.sources)
         setCategories(categoriesData)
         setHasNextPage(newsResponse.pagination?.hasNextPage ?? false)
+        setCurrentPage(1)
       } else {
         setError(newsResponse.error || "Failed to load news")
       }
@@ -48,13 +51,13 @@ export function useNews() {
       setError("Failed to load news data")
     } finally {
       setLoading(false)
+      isInitialLoad.current = false
     }
   }
 
   const applyFilters = () => {
     let filtered = [...articles]
 
-    // Search filter
     if (filters.searchQuery.trim()) {
       const query = filters.searchQuery.toLowerCase()
       filtered = filtered.filter(
@@ -65,17 +68,14 @@ export function useNews() {
       )
     }
 
-    // Source filter
     if (filters.selectedSource !== "all") {
       filtered = filtered.filter((article) => article.source === filters.selectedSource)
     }
 
-    // Category filter
     if (filters.selectedCategory !== "all") {
       filtered = filtered.filter((article) => article.category === filters.selectedCategory)
     }
 
-    // Date filter
     if (filters.selectedDate) {
       filtered = filtered.filter((article) => article.date.startsWith(filters.selectedDate))
     }
@@ -93,12 +93,13 @@ export function useNews() {
       setLoading(true)
       const response = await searchNews(filters.searchQuery)
       if (response.success) {
-        // Deduplicate search results
         const uniqueArticles = response.data.filter(
           (article, index, self) => index === self.findIndex((a) => a.id === article.id),
         )
         setArticles(uniqueArticles)
         setSources(response.sources)
+        setCurrentPage(1)
+        setHasNextPage(false)
       } else {
         setError(response.error || "Search failed")
       }
@@ -109,23 +110,29 @@ export function useNews() {
     }
   }
 
-  const loadMoreArticles = async () => {
-    if (!hasNextPage || loadingMore) return
+  const loadMoreArticles = useCallback(async () => {
+    if (!hasNextPage || loadingMore || filters.searchQuery.trim()) return
+    
     setLoadingMore(true)
     const nextPage = currentPage + 1
-    const newsResponse = await getAllNews(nextPage, ITEMS_PER_PAGE)
-    if (newsResponse.success) {
-      // Deduplicate articles by ID to prevent duplicate keys
-      setArticles((prev) => {
-        const existingIds = new Set(prev.map((article) => article.id))
-        const newArticles = newsResponse.data.filter((article) => !existingIds.has(article.id))
-        return [...prev, ...newArticles]
-      })
-      setCurrentPage(nextPage)
-      setHasNextPage(newsResponse.pagination?.hasNextPage ?? false)
+    
+    try {
+      const newsResponse = await getAllNews(nextPage, ITEMS_PER_PAGE)
+      if (newsResponse.success) {
+        setArticles((prev) => {
+          const existingIds = new Set(prev.map((article) => article.id))
+          const newArticles = newsResponse.data.filter((article) => !existingIds.has(article.id))
+          return [...prev, ...newArticles]
+        })
+        setCurrentPage(nextPage)
+        setHasNextPage(newsResponse.pagination?.hasNextPage ?? false)
+      }
+    } catch (err) {
+      console.error("Failed to load more articles:", err)
+    } finally {
+      setLoadingMore(false)
     }
-    setLoadingMore(false)
-  }
+  }, [hasNextPage, loadingMore, currentPage, filters.searchQuery])
 
   const clearFilters = () => {
     setFilters({
@@ -140,13 +147,33 @@ export function useNews() {
     setFilters((prev) => ({ ...prev, [key]: value }))
   }
 
-  // Helper function to generate unique keys for articles
   const generateUniqueKey = (article: Article, index: number): string => {
-    // Use article ID if available and unique, otherwise create a composite key
     return article.id || `${article.title}-${article.source}-${index}`
   }
 
-  // Effects
+  const setupObserver = useCallback(() => {
+    if (observerRef.current) {
+      observerRef.current.disconnect()
+    }
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries
+        if (entry.isIntersecting && hasNextPage && !loadingMore && !loading) {
+          loadMoreArticles()
+        }
+      },
+      { 
+        threshold: 0.4,
+        rootMargin: '100px'
+      }
+    )
+
+    if (bottomRef.current) {
+      observerRef.current.observe(bottomRef.current)
+    }
+  }, [hasNextPage, loadingMore, loading, loadMoreArticles])
+
   useEffect(() => {
     loadInitialData()
   }, [])
@@ -156,26 +183,27 @@ export function useNews() {
   }, [articles, filters])
 
   useEffect(() => {
-    if (!hasNextPage) return
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          loadMoreArticles()
+    if (!isInitialLoad.current && hasNextPage && !filters.searchQuery.trim()) {
+      const timer = setTimeout(() => {
+        setupObserver()
+      }, 100)
+
+      return () => {
+        clearTimeout(timer)
+        if (observerRef.current) {
+          observerRef.current.disconnect()
         }
-      },
-      { threshold: 1 },
-    )
-
-    if (bottomRef.current) {
-      observer.observe(bottomRef.current)
-    }
-
-    return () => {
-      if (bottomRef.current) {
-        observer.unobserve(bottomRef.current)
       }
     }
-  }, [hasNextPage, loadingMore, articles])
+  }, [hasNextPage, filters.searchQuery, setupObserver, filteredArticles.length])
+
+  useEffect(() => {
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect()
+      }
+    }
+  }, [])
 
   return {
     articles: filteredArticles,
