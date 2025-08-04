@@ -25,6 +25,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
 
   return (
     <Card className="h-full flex flex-col hover:shadow-lg transition-all duration-200 hover:scale-[1.02]">
+      <Link href={`/article/${article.id}`}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2 mb-2">
           <Badge variant="outline" className="text-xs shrink-0">
@@ -52,7 +53,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
             }}
           />
         </CardDescription>
-        <div className="flex items-center justify-between pt-2 border-t gap-2">
+        {/* <div className="flex items-center justify-between pt-2 border-t gap-2">
           <Link href={createRedirectUrl()} className="flex-1">
             <Button
               variant="outline"
@@ -60,12 +61,13 @@ export function ArticleCard({ article }: ArticleCardProps) {
               className="w-full group hover:bg-blue-50 hover:border-blue-300 transition-colors bg-transparent"
             >
               <ExternalLink className="h-4 w-4 mr-2 group-hover:text-blue-600" />
-              <span className="hidden sm:inline group-hover:text-blue-600">Read Original Article</span>
-              <span className="sm:hidden group-hover:text-blue-600">Read Original</span>
+              <span className="hidden sm:inline group-hover:text-blue-600">Read More</span>
+              <span className="sm:hidden group-hover:text-blue-600">Read More</span>
             </Button>
           </Link>
-        </div>
+        </div> */}
       </CardContent>
+      </Link>
     </Card>
   )
 }
