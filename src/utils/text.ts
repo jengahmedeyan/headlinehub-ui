@@ -28,3 +28,26 @@ export function truncateHtmlContent(html: string, maxLength = 200): string {
 
   return truncated + "..."
 }
+
+ export const isTruncated = (content: string): boolean => {
+  const cleanText = content.replace(/<[^>]*>/g, '').trim()
+
+  const truncationPatterns = [
+    /\[\.\.\.\]$/,
+    /\.\.\.$/,
+    /\[…\]$/,
+    /…$/,
+    /\[continue reading\]/i,
+    /\[read more\]/i,
+    /\[full article\]/i,
+    /read the full/i,
+  ]
+
+  const hasIncompleteLastSentence = !cleanText.match(/[.!?]$/)
+  const wordCount = cleanText.split(/\s+/).length
+  const isVeryShort = wordCount < 50
+
+  return truncationPatterns.some(pattern => pattern.test(cleanText)) ||
+         (isVeryShort && hasIncompleteLastSentence) ||
+         cleanText.length < 200
+}
