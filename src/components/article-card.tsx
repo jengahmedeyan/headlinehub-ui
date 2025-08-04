@@ -33,8 +33,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
           </Badge>
           <div className="flex items-center text-xs text-gray-500 shrink-0">
             <Clock className="h-3 w-3 mr-1" />
-            <span className="hidden sm:inline">{formatDate(article.date)}</span>
-            <span className="sm:hidden">{formatDate(article.date).split(" ")[0]}</span>
+            <span className="inline">{formatDate(article.date)}</span>
           </div>
         </div>
         <CardTitle className="text-base sm:text-lg leading-tight line-clamp-3">{article.title}</CardTitle>
