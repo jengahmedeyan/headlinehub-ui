@@ -36,9 +36,7 @@ export async function getAllNews(
       query += `&date=${encodeURIComponent(dateParam)}`;
     }
     const url = `${baseURL}/news${query}`;
-    const response = await fetch(url, {
-      cache: "no-store",
-    });
+    const response = await fetch(url);
 
     return await response.json();
   } catch (error) {
