@@ -64,9 +64,12 @@ export function NewsHeader({
         {/* Header Title - Mobile Optimized */}
         <div className="flex items-center justify-between mb-4">
           <div className="min-w-0 flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">
-              HeadlineHub
-            </h1>
+            <div className="flex items-center gap-2 sm:gap-3">
+            <h1 className="text-lg sm:text-xl md:text-3xl font-bold text-primary truncate">HeadlineHub</h1>
+            <Badge variant="secondary" className="inline-flex text-xs">
+              Gambia
+            </Badge>
+          </div>
             <p className="text-sm sm:text-base text-gray-600 mt-1 hidden sm:block">
               Stay updated with the latest news from multiple sources
             </p>
