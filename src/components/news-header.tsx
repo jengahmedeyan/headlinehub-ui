@@ -195,7 +195,7 @@ export function NewsHeader({
                       </Select>
                     </div>
 
-                    <div className="flex-1 w-full">
+                    {/* <div className="flex-1 w-full">
                       <label className="text-sm font-medium text-gray-700 mb-2 block">
                         Category
                       </label>
@@ -217,7 +217,7 @@ export function NewsHeader({
                           ))}
                         </SelectContent>
                       </Select>
-                    </div>
+                    </div> */}
                   </div>
 
                   <div>

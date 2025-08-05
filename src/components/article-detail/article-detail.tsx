@@ -10,9 +10,10 @@ import { Article } from "@/types/article"
 interface ArticleDetailProps {
   article: Article
   onBack: () => void
+  backButtonLabel?: string
 }
 
-export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
+export function ArticleDetail({ article, onBack, backButtonLabel }: ArticleDetailProps) {
   const [isHydrated, setIsHydrated] = useState(false)
 
   useEffect(() => {
@@ -27,7 +28,7 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <BackButton onClick={onBack} />
+          <BackButton onClick={onBack} label={backButtonLabel} />
 
           <Card>
             <ArticleHeader article={article} />
