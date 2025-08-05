@@ -20,7 +20,7 @@ export function ArticleDetail({ article, onBack }: ArticleDetailProps) {
   }, [])
 
   if (!isHydrated) {
-    return null // or a simple loading state
+    return null
   }
 
   return (
