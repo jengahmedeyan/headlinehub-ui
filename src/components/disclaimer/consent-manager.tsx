@@ -29,7 +29,7 @@ export default function ConsentManager() {
 
   return (
     <>
-      <DisclaimerModal isVisible={showDisclaimer} onAccept={acceptDisclaimer} isLoading={isPending} />
+      <DisclaimerModal isVisible={showDisclaimer} onAccept={acceptDisclaimer} />
 
       <CookieConsentModal
         isVisible={showCookieConsent}
