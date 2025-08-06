@@ -4,6 +4,7 @@ import { GeistMono } from "geist/font/mono";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import ConsentManager from "@/components/disclaimer/consent-manager";
+import { ProviderWrapper } from "@/providers/provider-wrapper";
 
 export const metadata: Metadata = {
   title: "Headline Hub",
@@ -27,9 +28,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <body>
-        {children}
-        <Analytics />
-        <ConsentManager />
+        <ProviderWrapper>
+          {children}
+          <Analytics />
+          <ConsentManager />
+        </ProviderWrapper>
       </body>
     </html>
   );
