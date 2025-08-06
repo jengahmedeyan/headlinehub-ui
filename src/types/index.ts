@@ -20,3 +20,16 @@ export const COOKIE_KEYS = {
   DISCLAIMER: "gambia_news_disclaimer",
   PREFERENCES: "gambia_news_preferences",
 } as const
+
+export interface CookieConsentModalProps {
+  isVisible: boolean
+  showSettings: boolean
+  preferences: CookiePreferences
+  isLoading?: boolean
+  onAcceptAll: () => void
+  onRejectAll: () => void
+  onSavePreferences: () => void
+  onUpdatePreference: (type: keyof CookiePreferences, value: boolean) => void
+  onOpenSettings: () => void
+  onCloseSettings: () => void
+}
