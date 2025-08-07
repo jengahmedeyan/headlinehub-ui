@@ -21,63 +21,76 @@ import {
 } from "@/components/ui/sheet";
 import { DatePicker } from "@/components/ui/date-picker";
 import { format } from "date-fns";
-import type { NewsHeaderProps } from "../types/article";
+import { useArticleGlobalContext } from "@/providers/article-context";
 
-export function NewsHeader({
-  sources,
-  categories,
-  filters,
-  onSearch,
-  onClearFilters,
-  onUpdateFilter,
-}: NewsHeaderProps) {
+interface NewsHeaderProps {
+  onSearch: () => void;
+}
+
+export function NewsHeader({ onSearch }: NewsHeaderProps) {
+  const { 
+    filterHook, 
+    availableSources, 
+    availableCategories 
+  } = useArticleGlobalContext();
+
+  const {
+    filters,
+    updateFilter,
+    clearFilters,
+    hasActiveFilters
+  } = filterHook;
+
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    filters.selectedDate ? new Date(filters.selectedDate) : undefined
+    filters?.selectedDate ? new Date(filters.selectedDate) : undefined
   );
+
+  if (!filters) {
+    return (
+      <header className="bg-white shadow-sm border-b sticky top-0 z-40">
+        <div className="container mx-auto px-4 py-4">
+          <div>Loading...</div>
+        </div>
+      </header>
+    );
+  }
 
   const handleDateChange = (date: Date | undefined) => {
     setSelectedDate(date);
-    onUpdateFilter(
+    updateFilter(
       "selectedDate",
       date ? date.toISOString().split("T")[0] : ""
     );
   };
 
-  const hasActiveFilters =
-    filters.selectedSource !== "all" ||
-    filters.selectedCategory !== "all" ||
-    filters.selectedDate !== "";
-
   return (
     <header className="bg-white shadow-sm border-b sticky top-0 z-40">
       <div className="container mx-auto px-4 py-4">
-        {/* Header Title - Mobile Optimized */}
         <div className="flex items-center justify-between mb-4">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 sm:gap-3">
-            <h1 className="text-lg sm:text-xl md:text-3xl font-bold text-primary truncate">HeadlineHub</h1>
-            <Badge variant="secondary" className="inline-flex text-xs">
-              Gambia
-            </Badge>
-          </div>
+              <h1 className="text-lg sm:text-xl md:text-3xl font-bold text-primary truncate">HeadlineHub</h1>
+              <Badge variant="secondary" className="inline-flex text-xs">
+                Gambia
+              </Badge>
+            </div>
             <p className="text-sm sm:text-base text-gray-600 mt-1 hidden sm:block">
               Stay updated with the latest news from multiple sources
             </p>
           </div>
         </div>
 
-        {/* Search Bar - Full Width on Mobile */}
         <div className="mb-4">
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 placeholder="Search articles..."
-                value={filters.searchQuery}
-                onChange={(e) => onUpdateFilter("searchQuery", e.target.value)}
+                value={filters.searchQuery || ""}
+                onChange={(e) => updateFilter("searchQuery", e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && onSearch()}
-                className="pl-10 text-base" // Prevent zoom on iOS
+                className="pl-10 text-base"
               />
             </div>
             <Button onClick={onSearch} size="default" className="shrink-0">
@@ -87,20 +100,18 @@ export function NewsHeader({
           </div>
         </div>
 
-        {/* Filters - Mobile Sheet, Desktop Inline */}
         <div className="flex items-center justify-between">
-          {/* Desktop Filters */}
           <div className="hidden lg:flex gap-3 flex-1">
             <Select
-              value={filters.selectedSource}
-              onValueChange={(value) => onUpdateFilter("selectedSource", value)}
+              value={filters.selectedSource || "all"}
+              onValueChange={(value) => updateFilter("selectedSource", value)}
             >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="All Sources" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Sources</SelectItem>
-                {sources.map((source) => (
+                {availableSources.map((source) => (
                   <SelectItem key={source} value={source}>
                     {source}
                   </SelectItem>
@@ -109,17 +120,15 @@ export function NewsHeader({
             </Select>
 
             {/* <Select
-              value={filters.selectedCategory}
-              onValueChange={(value) =>
-                onUpdateFilter("selectedCategory", value)
-              }
+              value={filters.selectedCategory || "all"}
+              onValueChange={(value) => updateFilter("selectedCategory", value)}
             >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                {categories.map((category) => (
+                {availableCategories.map((category) => (
                   <SelectItem key={category} value={category}>
                     {category}
                   </SelectItem>
@@ -134,13 +143,12 @@ export function NewsHeader({
               className="w-[180px]"
             />
 
-            <Button variant="outline" onClick={onClearFilters} size="default">
+            <Button variant="outline" onClick={clearFilters} size="default">
               <X className="h-4 w-4 mr-2" />
               Clear
             </Button>
           </div>
 
-          {/* Mobile Filter Button */}
           <div className="lg:hidden flex items-center gap-2">
             <Sheet open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
               <SheetTrigger asChild>
@@ -167,17 +175,15 @@ export function NewsHeader({
                         Source
                       </label>
                       <Select
-                        value={filters.selectedSource}
-                        onValueChange={(value) =>
-                          onUpdateFilter("selectedSource", value)
-                        }
+                        value={filters.selectedSource || "all"}
+                        onValueChange={(value) => updateFilter("selectedSource", value)}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="All Sources" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">All Sources</SelectItem>
-                          {sources.map((source) => (
+                          {availableSources.map((source) => (
                             <SelectItem key={source} value={source}>
                               {source}
                             </SelectItem>
@@ -186,22 +192,21 @@ export function NewsHeader({
                       </Select>
                     </div>
 
+                    {/* Uncomment if you want to use categories */}
                     {/* <div className="flex-1 w-full">
                       <label className="text-sm font-medium text-gray-700 mb-2 block">
                         Category
                       </label>
                       <Select
-                        value={filters.selectedCategory}
-                        onValueChange={(value) =>
-                          onUpdateFilter("selectedCategory", value)
-                        }
+                        value={filters.selectedCategory || "all"}
+                        onValueChange={(value) => updateFilter("selectedCategory", value)}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="All Categories" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">All Categories</SelectItem>
-                          {categories.map((category) => (
+                          {availableCategories.map((category) => (
                             <SelectItem key={category} value={category}>
                               {category}
                             </SelectItem>
@@ -225,7 +230,7 @@ export function NewsHeader({
                   <div className="flex gap-3 pt-4">
                     <Button
                       variant="outline"
-                      onClick={onClearFilters}
+                      onClick={clearFilters}
                       className="flex-1 bg-transparent"
                     >
                       <X className="h-4 w-4 mr-2" />
@@ -244,25 +249,24 @@ export function NewsHeader({
           </div>
         </div>
 
-        {/* Active Filters Display */}
         {hasActiveFilters && (
           <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t">
-            {filters.selectedSource !== "all" && (
+            {filters.selectedSource && filters.selectedSource !== "all" && (
               <Badge variant="secondary" className="text-xs">
                 Source: {filters.selectedSource}
                 <button
-                  onClick={() => onUpdateFilter("selectedSource", "all")}
+                  onClick={() => updateFilter("selectedSource", "all")}
                   className="ml-1 hover:text-red-600"
                 >
                   <X className="h-3 w-3" />
                 </button>
               </Badge>
             )}
-            {filters.selectedCategory !== "all" && (
+            {filters.selectedCategory && filters.selectedCategory !== "all" && (
               <Badge variant="secondary" className="text-xs">
                 Category: {filters.selectedCategory}
                 <button
-                  onClick={() => onUpdateFilter("selectedCategory", "all")}
+                  onClick={() => updateFilter("selectedCategory", "all")}
                   className="ml-1 hover:text-red-600"
                 >
                   <X className="h-3 w-3" />
@@ -274,7 +278,7 @@ export function NewsHeader({
                 Date: {format(new Date(filters.selectedDate), "MMM dd, yyyy")}
                 <button
                   onClick={() => {
-                    onUpdateFilter("selectedDate", "");
+                    updateFilter("selectedDate", "");
                     setSelectedDate(undefined);
                   }}
                   className="ml-1 hover:text-red-600"

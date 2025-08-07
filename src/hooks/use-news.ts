@@ -1,15 +1,13 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
-import type { Article, FilterState } from "../types/article"
+import type { Article } from "../types/article"
 import { ITEMS_PER_PAGE } from "../constants"
 import { getAllNews, getAvailableCategories, searchNews } from "@/app/actions/news"
+import { useArticleGlobalContext } from "@/providers/article-context"
 
 export function useNews() {
   const [articles, setArticles] = useState<Article[]>([])
-  const [filteredArticles, setFilteredArticles] = useState<Article[]>([])
-  const [sources, setSources] = useState<string[]>([])
-  const [categories, setCategories] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
@@ -19,12 +17,13 @@ export function useNews() {
   const observerRef = useRef<IntersectionObserver | null>(null)
   const isInitialLoad = useRef(true)
 
-  const [filters, setFilters] = useState<FilterState>({
-    searchQuery: "",
-    selectedSource: "all",
-    selectedCategory: "all",
-    selectedDate: "",
-  })
+  const { 
+    filterHook, 
+    setAvailableSources, 
+    setAvailableCategories 
+  } = useArticleGlobalContext()
+
+  const filteredArticles = filterHook.applyFilters(articles)
 
   const loadInitialData = async () => {
     try {
@@ -35,13 +34,14 @@ export function useNews() {
       ])
 
       if (newsResponse.success) {
-
         const uniqueArticles = newsResponse.data.filter(
           (article, index, self) => index === self.findIndex((a) => a.id === article.id),
         )
         setArticles(uniqueArticles)
-        setSources(newsResponse.sources)
-        setCategories(categoriesData)
+        
+        setAvailableSources(newsResponse.sources)
+        setAvailableCategories(categoriesData)
+        
         setHasNextPage(newsResponse.pagination?.hasNextPage ?? false)
         setCurrentPage(1)
       } else {
@@ -55,49 +55,21 @@ export function useNews() {
     }
   }
 
-  const applyFilters = () => {
-    let filtered = [...articles]
-
-    if (filters.searchQuery.trim()) {
-      const query = filters.searchQuery.toLowerCase()
-      filtered = filtered.filter(
-        (article) =>
-          article.title.toLowerCase().includes(query) ||
-          article.content.toLowerCase().includes(query) ||
-          article.source.toLowerCase().includes(query),
-      )
-    }
-
-    if (filters.selectedSource !== "all") {
-      filtered = filtered.filter((article) => article.source === filters.selectedSource)
-    }
-
-    if (filters.selectedCategory !== "all") {
-      filtered = filtered.filter((article) => article.category === filters.selectedCategory)
-    }
-
-    if (filters.selectedDate) {
-      filtered = filtered.filter((article) => article.date.startsWith(filters.selectedDate))
-    }
-
-    setFilteredArticles(filtered)
-  }
-
   const handleSearch = async () => {
-    if (!filters.searchQuery.trim()) {
+    if (!filterHook.filters.searchQuery.trim()) {
       loadInitialData()
       return
     }
 
     try {
       setLoading(true)
-      const response = await searchNews(filters.searchQuery)
+      const response = await searchNews(filterHook.filters.searchQuery)
       if (response.success) {
         const uniqueArticles = response.data.filter(
           (article, index, self) => index === self.findIndex((a) => a.id === article.id),
         )
         setArticles(uniqueArticles)
-        setSources(response.sources)
+        setAvailableSources(response.sources)
         setCurrentPage(1)
         setHasNextPage(false)
       } else {
@@ -111,7 +83,7 @@ export function useNews() {
   }
 
   const loadMoreArticles = useCallback(async () => {
-    if (!hasNextPage || loadingMore || filters.searchQuery.trim()) return
+    if (!hasNextPage || loadingMore || filterHook.filters.searchQuery.trim()) return
     
     setLoadingMore(true)
     const nextPage = currentPage + 1
@@ -132,20 +104,7 @@ export function useNews() {
     } finally {
       setLoadingMore(false)
     }
-  }, [hasNextPage, loadingMore, currentPage, filters.searchQuery])
-
-  const clearFilters = () => {
-    setFilters({
-      searchQuery: "",
-      selectedSource: "all",
-      selectedCategory: "all",
-      selectedDate: "",
-    })
-  }
-
-  const updateFilter = (key: keyof FilterState, value: string) => {
-    setFilters((prev) => ({ ...prev, [key]: value }))
-  }
+  }, [hasNextPage, loadingMore, currentPage, filterHook.filters.searchQuery])
 
   const generateUniqueKey = (article: Article, index: number): string => {
     return article.id || `${article.title}-${article.source}-${index}`
@@ -179,11 +138,7 @@ export function useNews() {
   }, [])
 
   useEffect(() => {
-    applyFilters()
-  }, [articles, filters])
-
-  useEffect(() => {
-    if (!isInitialLoad.current && hasNextPage && !filters.searchQuery.trim()) {
+    if (!isInitialLoad.current && hasNextPage && !filterHook.filters.searchQuery.trim()) {
       const timer = setTimeout(() => {
         setupObserver()
       }, 100)
@@ -195,7 +150,7 @@ export function useNews() {
         }
       }
     }
-  }, [hasNextPage, filters.searchQuery, setupObserver, filteredArticles.length])
+  }, [hasNextPage, filterHook.filters.searchQuery, setupObserver, filteredArticles.length])
 
   useEffect(() => {
     return () => {
@@ -207,18 +162,15 @@ export function useNews() {
 
   return {
     articles: filteredArticles,
-    sources,
-    categories,
+    allArticles: articles,
     loading,
     error,
     hasNextPage,
     loadingMore,
     bottomRef,
-    filters,
     loadInitialData,
     handleSearch,
-    clearFilters,
-    updateFilter,
     generateUniqueKey,
+    filterHook,
   }
 }
