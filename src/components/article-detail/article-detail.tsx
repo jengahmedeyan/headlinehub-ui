@@ -6,6 +6,7 @@ import { ArticleHeader } from "./article-header"
 import { ArticleContent } from "./article-content"
 import { BackButton } from "./back-button"
 import { Article } from "@/types/article"
+import { useArticleGlobalContext } from "@/providers/article-context"
 
 interface ArticleDetailProps {
   article: Article
@@ -15,10 +16,16 @@ interface ArticleDetailProps {
 
 export function ArticleDetail({ article, onBack, backButtonLabel }: ArticleDetailProps) {
   const [isHydrated, setIsHydrated] = useState(false)
+  const { setCurrentArticle } = useArticleGlobalContext()
 
   useEffect(() => {
     setIsHydrated(true)
-  }, [])
+    setCurrentArticle(article)
+    
+    return () => {
+      setCurrentArticle(null)
+    }
+  }, [article, setCurrentArticle])
 
   if (!isHydrated) {
     return null
@@ -29,10 +36,9 @@ export function ArticleDetail({ article, onBack, backButtonLabel }: ArticleDetai
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <BackButton onClick={onBack} label={backButtonLabel} />
-
           <Card>
-            <ArticleHeader article={article} />
-            <ArticleContent article={article} />
+            <ArticleHeader />
+            <ArticleContent />
           </Card>
         </div>
       </div>

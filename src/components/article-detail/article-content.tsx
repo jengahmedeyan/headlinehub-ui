@@ -6,19 +6,28 @@ import { ExternalLink } from "lucide-react"
 import { isTruncated, simpleSanitize } from "../../utils/text"
 import { Article } from "@/types/article"
 import { formatDate } from "@/utils/date"
+import { ArticleSummary } from "../article-summary"
+import { useArticleGlobalContext } from "@/providers/article-context"
 
-interface ArticleContentProps {
-  article: Article
-}
+export function ArticleContent() {
+  const { currentArticle: article, showSummary } = useArticleGlobalContext()
 
-export function ArticleContent({ article }: ArticleContentProps) {
+  if (!article) {
+    return null
+  }
 
   const contentIsTruncated = isTruncated(article.content)
 
   return (
     <CardContent>
+
+        {showSummary && (
+        <div className="mb-4">
+          <ArticleSummary article={article} variant="inline" />
+        </div>
+      )}
       <div
-        className="prose max-w-none text-gray-800 leading-relaxed"
+        className="prose max-w-none text-gray-800 leading-relaxed text-xl"
         dangerouslySetInnerHTML={{
           __html: simpleSanitize(article.content),
         }}
