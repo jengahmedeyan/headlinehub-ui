@@ -23,7 +23,7 @@ export interface NewsResponse {
   };
 }
 
-const baseURL = process.env.baseURL + "api";
+const API_BASE_URL = process.env.API_BASE_URL;
 
 export async function getAllNews(
   page: number = 1,
@@ -35,7 +35,7 @@ export async function getAllNews(
     if (dateParam) {
       query += `&date=${encodeURIComponent(dateParam)}`;
     }
-    const url = `${baseURL}/news${query}`;
+    const url = `${API_BASE_URL}/news${query}`;
     const response = await fetch(url);
 
     return await response.json();
@@ -54,7 +54,7 @@ export async function getAllNews(
 export async function searchNews(query: string): Promise<NewsResponse> {
   try {
     const response = await fetch(
-      `${baseURL}/news/search?q=${encodeURIComponent(query)}`
+      `${API_BASE_URL}/news/search?q=${encodeURIComponent(query)}`
     );
     return await response.json();
   } catch (error) {
@@ -71,7 +71,7 @@ export async function searchNews(query: string): Promise<NewsResponse> {
 export async function getNewsBySource(source: string): Promise<NewsResponse> {
   try {
     const response = await fetch(
-      `${baseURL}/news/source/${encodeURIComponent(source)}`
+      `${API_BASE_URL}/news/source/${encodeURIComponent(source)}`
     );
     return await response.json();
   } catch (error) {
@@ -87,7 +87,7 @@ export async function getNewsBySource(source: string): Promise<NewsResponse> {
 
 export async function getArticleById(id: string): Promise<NewsResponse> {
   try {
-    const response = await fetch(`${baseURL}/news/${id}`);
+    const response = await fetch(`${API_BASE_URL}/news/${id}`);
     return await response.json();
   } catch (error) {
     return {
@@ -102,7 +102,7 @@ export async function getArticleById(id: string): Promise<NewsResponse> {
 
 export async function getAvailableCategories(): Promise<string[]> {
   try {
-    const response = await fetch(`${baseURL}/categories`);
+    const response = await fetch(`${API_BASE_URL}/categories`);
     const data = await response.json();
     return data.categories || [];
   } catch (error) {

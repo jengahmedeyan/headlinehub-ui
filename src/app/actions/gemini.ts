@@ -1,6 +1,4 @@
-"use client"
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+"use server"
 
 export interface SummaryResponse {
   success: boolean
@@ -17,6 +15,8 @@ export interface SavedSummary {
   createdAt: string
   updatedAt: string
 }
+
+const API_BASE_URL = process.env.API_BASE_URL;
 
 export async function getSummary(articleId: string): Promise<SummaryResponse> {
   try {
