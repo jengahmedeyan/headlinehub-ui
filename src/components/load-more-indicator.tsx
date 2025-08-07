@@ -1,10 +1,7 @@
 "use client"
 
+import type { LoadMoreIndicatorProps } from "@/types/article"
 import { Loader2 } from "lucide-react"
-
-interface LoadMoreIndicatorProps {
-  isLoading: boolean
-}
 
 export function LoadMoreIndicator({ isLoading }: LoadMoreIndicatorProps) {
   return (

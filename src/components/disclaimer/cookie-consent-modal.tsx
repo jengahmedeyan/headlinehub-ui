@@ -4,21 +4,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import type { CookiePreferences } from "@/utils/cookies"
-import { Cookie, Settings, Shield, BarChart3, Heart } from "lucide-react"
-
-interface CookieConsentModalProps {
-  isVisible: boolean
-  showSettings: boolean
-  preferences: CookiePreferences
-  isLoading?: boolean
-  onAcceptAll: () => void
-  onRejectAll: () => void
-  onSavePreferences: () => void
-  onUpdatePreference: (type: keyof CookiePreferences, value: boolean) => void
-  onOpenSettings: () => void
-  onCloseSettings: () => void
-}
+import type { CookieConsentModalProps } from "@/types"
+import { Cookie, Settings, Shield, BarChart3} from "lucide-react"
 
 export default function CookieConsentModal({
   isVisible,

@@ -2,10 +2,7 @@
 
 import { Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
-
-interface EmptyStateProps {
-  onClearFilters: () => void
-}
+import { EmptyStateProps } from "@/types/article"
 
 export function EmptyState({ onClearFilters }: EmptyStateProps) {
   return (

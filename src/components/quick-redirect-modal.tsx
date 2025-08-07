@@ -11,14 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { ExternalLink, Shield, ArrowRight } from "lucide-react"
-
-interface QuickRedirectModalProps {
-  isOpen: boolean
-  onClose: () => void
-  url: string
-  source: string
-  title: string
-}
+import type { QuickRedirectModalProps } from "@/types/article"
 
 export function QuickRedirectModal({ isOpen, onClose, url, source, title }: QuickRedirectModalProps) {
   const [isRedirecting, setIsRedirecting] = useState(false)

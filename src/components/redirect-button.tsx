@@ -1,18 +1,9 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { RedirectButtonProps } from "@/types/article"
 import { ExternalLink, Globe } from "lucide-react"
 import Link from "next/link"
-
-interface RedirectButtonProps {
-  url: string
-  source: string
-  title: string
-  variant?: "default" | "outline" | "ghost"
-  size?: "sm" | "default" | "lg"
-  className?: string
-  showDomain?: boolean
-}
 
 export function RedirectButton({
   url,

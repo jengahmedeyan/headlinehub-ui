@@ -21,16 +21,7 @@ import {
 } from "@/components/ui/sheet";
 import { DatePicker } from "@/components/ui/date-picker";
 import { format } from "date-fns";
-import type { FilterState } from "../types/article";
-
-interface NewsHeaderProps {
-  sources: string[];
-  categories: string[];
-  filters: FilterState;
-  onSearch: () => void;
-  onClearFilters: () => void;
-  onUpdateFilter: (key: keyof FilterState, value: string) => void;
-}
+import type { NewsHeaderProps } from "../types/article";
 
 export function NewsHeader({
   sources,

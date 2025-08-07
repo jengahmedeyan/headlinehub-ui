@@ -11,7 +11,7 @@ import { BackToTop } from "../../../components/ui/back-to-top"
 export default function ArticleDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const { article, loading, error, refetch } = useArticle(params.id as string)
+  const { article, loading, error, refetch } = useArticle(params.id as string)  
 
   const [backButtonLabel, setBackButtonLabel] = useState("Back to Articles")
 
