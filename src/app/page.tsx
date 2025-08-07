@@ -10,23 +10,27 @@ import { EmptyState } from "../components/empty-state";
 import { LoadMoreIndicator } from "../components/load-more-indicator";
 import { BackToTop } from "../components/ui/back-to-top";
 import { NewsHeaderSkeleton } from "@/components/skeleton/news-header";
+import { useArticleGlobalContext } from "@/providers/article-context";
 
 export default function Page() {
   const {
     articles,
-    sources,
-    categories,
     loading,
     error,
     hasNextPage,
     loadingMore,
     bottomRef,
-    filters,
     loadInitialData,
     handleSearch,
-    clearFilters,
-    updateFilter,
   } = useNews();
+
+  const { 
+      filterHook, 
+    } = useArticleGlobalContext();
+  
+    const {
+      clearFilters,
+    } = filterHook;
 
   if (loading) {
     return (
@@ -53,12 +57,7 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-gray-50">
       <NewsHeader
-        sources={sources}
-        categories={categories}
-        filters={filters}
         onSearch={handleSearch}
-        onClearFilters={clearFilters}
-        onUpdateFilter={updateFilter}
       />
 
       <main className="container mx-auto px-4 py-8">
