@@ -10,21 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-interface SearchFiltersProps {
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  selectedSource: string;
-  setSelectedSource: (source: string) => void;
-  selectedCategory: string;
-  setSelectedCategory: (category: string) => void;
-  selectedDate: string;
-  setSelectedDate: (date: string) => void;
-  sources: string[];
-  categories: string[];
-  onSearch: () => void;
-  onClearFilters: () => void;
-}
+import { SearchFiltersProps } from "@/types/article";
 
 export default function SearchFilters({
   searchQuery,
