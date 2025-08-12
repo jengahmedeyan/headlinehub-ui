@@ -27,6 +27,7 @@ export function useNews() {
 
   const loadInitialData = async () => {
     try {
+      setError(null); 
       setLoading(true)
       const [newsResponse, categoriesData] = await Promise.all([
         getAllNews(1, ITEMS_PER_PAGE),
