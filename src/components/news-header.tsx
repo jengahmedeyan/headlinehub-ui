@@ -119,7 +119,7 @@ export function NewsHeader({ onSearch }: NewsHeaderProps) {
               </SelectContent>
             </Select>
 
-            {/* <Select
+            <Select
               value={filters.selectedCategory || "all"}
               onValueChange={(value) => updateFilter("selectedCategory", value)}
             >
@@ -134,7 +134,7 @@ export function NewsHeader({ onSearch }: NewsHeaderProps) {
                   </SelectItem>
                 ))}
               </SelectContent>
-            </Select> */}
+            </Select>
 
             <DatePicker
               date={selectedDate}
@@ -192,8 +192,7 @@ export function NewsHeader({ onSearch }: NewsHeaderProps) {
                       </Select>
                     </div>
 
-                    {/* Uncomment if you want to use categories */}
-                    {/* <div className="flex-1 w-full">
+                    <div className="flex-1 w-full">
                       <label className="text-sm font-medium text-gray-700 mb-2 block">
                         Category
                       </label>
@@ -213,7 +212,7 @@ export function NewsHeader({ onSearch }: NewsHeaderProps) {
                           ))}
                         </SelectContent>
                       </Select>
-                    </div> */}
+                    </div>
                   </div>
 
                   <div>
