@@ -102,7 +102,7 @@ export async function getArticleById(id: string): Promise<NewsResponse> {
 
 export async function getAvailableCategories(): Promise<string[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/categories`);
+    const response = await fetch(`${API_BASE_URL}/news/categories`);
     const data = await response.json();
     return data.categories || [];
   } catch (error) {

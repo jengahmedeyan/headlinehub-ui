@@ -11,6 +11,7 @@ import { LoadMoreIndicator } from "../components/load-more-indicator";
 import { BackToTop } from "../components/ui/back-to-top";
 import { NewsHeaderSkeleton } from "@/components/skeleton/news-header";
 import { useArticleGlobalContext } from "@/providers/article-context";
+import { ErrorDisplay } from "@/components/error-display";
 
 export default function Page() {
   const {
@@ -41,18 +42,9 @@ export default function Page() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <Alert className="max-w-2xl mx-auto">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-        <div className="text-center mt-4">
-          <Button onClick={loadInitialData}>Try Again</Button>
-        </div>
-      </div>
-    );
-  }
+if (error) {
+  return <ErrorDisplay message={error} onRetry={loadInitialData} />;
+}
 
   return (
     <div className="min-h-screen bg-gray-50">
