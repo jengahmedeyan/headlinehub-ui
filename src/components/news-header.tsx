@@ -126,7 +126,7 @@ export function NewsHeader({ onSearch }: NewsHeaderProps) {
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-96 overflow-y-auto">
                 <SelectItem value="all">All Categories</SelectItem>
                 {availableCategories.map((category) => (
                   <SelectItem key={category} value={category}>
